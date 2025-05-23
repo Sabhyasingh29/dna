@@ -1,1 +1,40 @@
+name: DNA Encoding-Decoding Pipeline
+
+on: [push, pull_request]
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install build tools
+      run: sudo apt update && sudo apt install -y build-essential
+
+    - name: Compile encoder (bd.c)
+      run: gcc encoding/bd.c -o encoder
+
+    - name: Compile decoder (test.c)
+      run: gcc decoding/test.c -o decoder
+
+    - name: Simulate input
+      run: echo "Hello DNA Storage" > encoding/input.txt
+
+    - name: Run encoder
+      run: ./encoder
+
+    - name: Simulate DNA Storalator
+      run: |
+        mkdir -p dnaSimulator/output/reconstruction
+        cp encoding/output.txt dnaSimulator/output/reconstruction/output-result-success.txt
+
+    - name: Copy encoded file to decoding/
+      run: cp dnaSimulator/output/reconstruction/output-result-success.txt decoding/encoded.txt
+
+    - name: Run decoder
+      run: ./decoder
+
+    - name: Display decoded output
+      run: cat decoding/decoded_output.txt
 
